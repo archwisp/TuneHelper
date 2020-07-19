@@ -1,8 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/python #vim: ts=4:sw=4:et
 import sys, os
 from tunehelper import logfile
 import csv
-
 
 if len(sys.argv) != 3:
     print "Usage: %s <logfile-directory> <output-directory>" % (os.path.basename(sys.argv[0]))
@@ -19,10 +18,10 @@ for filename in os.listdir(directory):
     sample_counter = 1
     last_file_sample = 0
     
-    for row in logfile.get_rows(directory + '/' + filename):
+    for row in logfile.getRows(directory + '/' + filename):
         if row['throttle'] == 78 and row['load'] > 95 and row['rpm'] > 5500 and row['speed'] > 60:
             
-            if last_file_sample != 0 and row['sample'] -1 != last_file_sample:
+            if last_file_sample != 0 and int(row['time']) != int(last_file_sample) and int(row['time']) -1 != int(last_file_sample):
                 sample_counter = 1
                 run += 1
             
@@ -32,14 +31,13 @@ for filename in os.listdir(directory):
 
                 wr.writerow([
                     'sample', 'time', 'Throttle', 'SpeedMPH', 'RPM',
-                    'CalcLoad', 'MAFVolts', 'MAF', 'STFT', 'LTFT', 'IAT',
+                    'CalcLoad', 'MAFVolts', 'STFT', 'LTFT', 'IAT',
                     'ECT', 'AFR', 'TargetAFR', 'CatTemp'
                 ])
 
-            print "File: %s Run: %s  Sample: %s  Time: %s  Throttle: %s  Load: %s  Speed: %s  RPM: %s  AFR: %s  Cat: %s F" % (
+            print "File: %s Run: %s  Time: %s  Throttle: %s  Load: %s  Speed: %s  RPM: %s  AFR: %s  Cat: %s F" % (
                 filename, 
                 str(run), 
-                str(row['sample']).ljust(6), 
                 str(row['time']).ljust(10), 
                 str(row['throttle']).ljust(3), 
                 str(row['load_band']).ljust(3), 
@@ -57,7 +55,7 @@ for filename in os.listdir(directory):
                 str(row['rpm']),
                 str(row['load']),
                 str(row['maf_volts']),
-                str(row['maf']),
+                # str(row['maf']),
                 str(row['stft']),
                 str(row['ltft']),
                 str(row['iat']),
@@ -67,5 +65,5 @@ for filename in os.listdir(directory):
                 str(row['cat'])
             ])
             
-            last_file_sample = row['sample']
+            last_file_sample = row['time']
             sample_counter += 1
