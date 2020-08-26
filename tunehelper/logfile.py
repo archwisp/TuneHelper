@@ -37,7 +37,6 @@ def getMazdaEditHeaderMap(header):
             'iat': header.index("Intake Air Temperature (OBD) (C)"),
             'load': header.index("Calculated Engine Load (OBD) (%)"),
             'ltft': header.index("Long Term Fuel Trim B1 (OBD) (%)"),
-            # 'maf': header.index(""),
             'maf_volts': header.index("Mass Airflow Sensor (Volts)"),
             'rpm': header.index("Engine Speed (OBD) (RPM)"),
             'speed': header.index("Vehicle Speed (OBD) (mph)"),
@@ -51,13 +50,13 @@ def getMazdaEditHeaderMap(header):
 
 def getTactrixHeaderMap(header):
     header_map = {
+            'sample': header.index("sample"),
             'afr': header.index("AFR"),
             'cat': header.index("CatTemp"),
             'ect': header.index("ECT"),
             'iat': header.index("IAT"),
             'load': header.index("CalcLoad"),
             'ltft': header.index("LTFT"),
-            # 'maf': header.index("MAF"),
             'maf_volts': header.index("MAFVolts"),
             'rpm': header.index("RPM"),
             'speed': header.index("SpeedMPH"),
@@ -99,6 +98,7 @@ def getRows(filename):
             afr_diff = int(round(float(row[header_map['afr']]) - float(row[header_map['target_afr']]), 2) * 100)
         
             rowobj = {
+                'sample': int(row[header_map['sample']]),
                 'afr': round(float(row[header_map['afr']]), 2),
                 'afr_diff': afr_diff,
                 'cat': int(round(float(row[header_map['cat']]), 3)),
@@ -106,13 +106,12 @@ def getRows(filename):
                 'iat': int(row[header_map['iat']]),
                 'load': load,
                 'load_band': load - (load % 5),
-                # 'maf': row[header_map['maf']],
                 'maf_volts': round(float(row[header_map['maf_volts']]), 2),
                 'ltft': ltft,
                 'ltr': load - throttle,
                 'rpm': rpm,
                 'rpm_band': rpm - (rpm % 250),
-                'speed': int(round(float(row[header_map['speed']]), 0)),
+                'speed': round(float(row[header_map['speed']]), 2),
                 'stft': stft,
                 'target_afr': round(float(row[header_map['target_afr']]), 2),
                 'throttle': throttle,
@@ -128,8 +127,9 @@ def printRow(filename, row):
     cat = row['cat'] 
     cat_f = int(cat * 1.8 + 32)
 
-    print("File: %s  Time: %s  Throttle: %s  Load: %s  Speed: %s  RPM: %s TragetAFR: %s  AFR: %s  Diff %%: %s  LTFT: %s  STFT: %s  ECT: %sC/%sF Cat: %sC/%sF" % (
+    print("File: %s  Sample: %s Time: %s  Throttle: %s  Load: %s  Speed: %s  RPM: %s TragetAFR: %s  AFR: %s  Diff %%: %s  LTFT: %s  STFT: %s  ECT: %sC/%sF Cat: %sC/%sF" % (
         filename, 
+        str(row['sample']).ljust(10), 
         str(row['time']).ljust(10), 
         str(row['throttle']).ljust(2), 
         str(row['load_band']).ljust(3), 
