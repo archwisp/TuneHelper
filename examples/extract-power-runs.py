@@ -3,8 +3,15 @@ import sys, os
 from tunehelper import logfile
 import csv
 
-# def calculate_force_from_speed(start_speed, end_speed, start_time, end_time):
+def acceleration_from_speed(velocity_change, duration):
+    return (velocity_change * 0.445) / duration
 
+def horsepower_from_acceleration(weight, acceleration_m_s_2, avg_velocity):
+    mass_kg = weight * 0.453592
+    force_n = mass_kg * acceleration_m_s_2
+    avg_velocity_m_s = avg_velocity * 0.454
+    power = force_n * avg_velocity_m_s
+    return power / 745.7
 
 if len(sys.argv) != 3:
     print "Usage: %s <logfile-directory> <output-directory>" % (os.path.basename(sys.argv[0]))
@@ -53,22 +60,17 @@ for filename in os.listdir(directory):
             # previous record
 
             if sample_counter > 1:
-                previous_speed = last_row['speed']
                 duration = row['time'] - last_row['time']
-                
-                velocity_difference = (row['speed'] - previous_speed)
-                acceleration_m_s_2 = (velocity_difference * 0.445) / duration
-                mass_kg = 3200 * 0.453592
-                force_n = mass_kg * acceleration_m_s_2
+                velocity_change = row['speed'] - last_row['speed'] 
+                avg_velocity = (row['speed'] + last_row['speed']) / 2
+                acceleration_m_s_2 = acceleration_from_speed(velocity_change, duration)
+                horsepower = horsepower_from_acceleration(3200, acceleration_m_s_2, avg_velocity) 
 
-                avg_velocity_m_s = ((row['speed'] + previous_speed) / 2) * 0.454
-                power = force_n * avg_velocity_m_s
-                horsepower = power / 745.7
-
-                print "RPM: %s Speed (mph): %s Time: %s Acceleration (m/s2): %s Horsepower: %s" % (
+                print "RPM: %s Speed (mph): %s Velocity Change: %s  Time: %s Acceleration (m/s2): %s Horsepower: %s" % (
                     str(row['rpm']).ljust(6), 
                     str(row['speed']).ljust(6), 
-                    str(duration).ljust(6), 
+                    str(round(velocity_change, 2)).ljust(6), 
+                    str(round(duration, 2)).ljust(6), 
                     str(round(acceleration_m_s_2, 2)).ljust(6),
                     str(int(horsepower)).ljust(6)
                 )
