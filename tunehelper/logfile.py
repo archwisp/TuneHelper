@@ -79,9 +79,10 @@ def getRows(filename):
             else:
                 header_map = getTactrixHeaderMap(header)
         except ValueError as error:
-            print("Failed to map headers for %s: %s" % (filename, error))
-            return
-            
+            yield Exception("Failed to map headers for %s: %s" % (filename, error))
+        
+        sample_counter = 1
+
         for row in rows:
             try:
                 float(row[header_map['time']])
@@ -98,7 +99,8 @@ def getRows(filename):
             afr_diff = int(round(float(row[header_map['afr']]) - float(row[header_map['target_afr']]), 2) * 100)
         
             rowobj = {
-                'sample': int(row[header_map['sample']]),
+                # 'sample': int(row[header_map['sample']]),
+                'sample': sample_counter,
                 'afr': round(float(row[header_map['afr']]), 2),
                 'afr_diff': afr_diff,
                 'cat': int(round(float(row[header_map['cat']]), 3)),
@@ -119,6 +121,7 @@ def getRows(filename):
                 'trim': trim,
             }
 
+            sample_counter += 1
             yield rowobj 
 
 def printRow(filename, row):
