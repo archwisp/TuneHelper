@@ -27,10 +27,6 @@ fourth_gear = rpm_bands.buildBands()
 
 # Final gear 4.44
 
-# First: (8590, 8863, 38.52, 39.77, 1.25)
-# Second: 
-
-
 for record in get_records(db):
     rpm = str(record[0] - (record[0] % 250))
     mph = record[1]
@@ -38,20 +34,14 @@ for record in get_records(db):
 
     # trans ratio = (rpm * tire diam) / (mph * rear diff ratio * 336)
     trans_ratio = round((int(rpm) * 25.6) / (mph * 4.44 * 336),2)
-    #  print str(record) + " Ratio: " + str(trans_ratio)
    
-
     if trans_ratio > 3:
-        #  print "First Gear"
         first_gear[rpm].append(accel)
     elif trans_ratio > 2:
-        #  print "Second Gear"
         second_gear[rpm].append(accel)
     elif trans_ratio > 1.1:
-        #  print "Third Gear"
         third_gear[rpm].append(accel)
     elif trans_ratio > .9:
-        #  print "Fourth Gear"
         fourth_gear[rpm].append(accel)
     
 print "First Gear:\n"
