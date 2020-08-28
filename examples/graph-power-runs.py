@@ -2,12 +2,19 @@
 import sys, os
 from tunehelper import logfile, rpm_bands
 import sqlite3
+
+if len(sys.argv) != 2:
+    print "Usage: %s <database-filename>" % (os.path.basename(sys.argv[0]))
+    sys.exit(0)
+
+db_filename = sys.argv[1]
+dry_run = False
     
 def get_records(db):
     cursor = db.cursor()
     return cursor.execute('''SELECT end_rpm, end_mph, ROUND(velocity_change,2), ROUND(duration,2) FROM logs WHERE velocity_change > 0 ORDER BY end_mph, end_rpm;''')
     
-db = sqlite3.connect('power-runs.db')
+db = sqlite3.connect(db_filename)
 
 first_gear = rpm_bands.buildBands() 
 second_gear = rpm_bands.buildBands() 

@@ -10,7 +10,7 @@ import sqlite3
 
 def init_db(db):
     cursor = db.cursor()
-    cursor.execute('''DROP TABLE logs''')
+    cursor.execute('''DROP TABLE IF EXISTS logs''')
     cursor.execute('''CREATE TABLE logs (start_rpm int, end_rpm int, start_mph int, end_mph int, duration float, velocity_change float)''')
 
 def insert_to_db(db, start_rpm, end_rpm, start_mph, end_mph, duration, velocity_change):
@@ -52,17 +52,18 @@ def print_current_run_summary(current_run):
                 str(int(horsepower)).ljust(6)
             )
 
-if len(sys.argv) != 2:
-    print "Usage: %s <logfile-directory>" % (os.path.basename(sys.argv[0]))
+if len(sys.argv) != 3:
+    print "Usage: %s <logfile-directory> <database-filename>" % (os.path.basename(sys.argv[0]))
     sys.exit(0)
 
 directory = sys.argv[1]
+db_filename = sys.argv[2]
 dry_run = False
 
 print "Processing directory: %s" % directory
 
 if not dry_run:
-    db = sqlite3.connect('power-runs.db')
+    db = sqlite3.connect(db_filename)
     init_db(db)
 
 for root, subdirs, files in os.walk(directory):
